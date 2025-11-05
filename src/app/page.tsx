@@ -1,65 +1,109 @@
-import Image from "next/image";
 
-export default function Home() {
+"use client";
+import { useMemo, useState } from "react";
+import { QUESTIONS } from "@/data/questions";
+import { LIGHTS, type LightKey } from "@/data/results";
+import Progress from "@/components/Progress";
+
+const ORDER: LightKey[] = ["ANXIN", "LIXING", "DONGCHA", "YUANRONG", "XIYUE", "FAXIN"];
+
+type Score = Record<LightKey, number>;
+const zeroScore: Score = Object.fromEntries(ORDER.map(k => [k, 0])) as Score;
+
+export default function Page() {
+  const total = QUESTIONS.length;
+  const [step, setStep] = useState(0);
+  const [score, setScore] = useState<Score>({ ...zeroScore });
+
+  const finished = step >= total;
+  const progress = (Math.min(step, total) / total) * 100;
+
+  const bestKey: LightKey = useMemo(() => {
+    return ORDER.reduce((acc, k) => (score[k] > score[acc] ? k : acc), ORDER[0]);
+  }, [score]);
+
+  const onChoose = (to: LightKey) => {
+    setScore((s) => ({ ...s, [to]: s[to] + 1 }));
+    setStep((n) => n + 1);
+  };
+
+  const reset = () => {
+    setStep(0);
+    setScore({ ...zeroScore });
+  };
+
+  const bgClass = finished ? LIGHTS[bestKey].gradient : "bg-gradient-to-br from-zinc-100 via-white to-white";
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <main className={`relative min-h-dvh ${bgClass}`}>
+      <div className="absolute inset-0 -z-10 [background-image:radial-gradient(50%_50%_at_50%_0%,rgba(0,0,0,0.06),rgba(0,0,0,0))]" />
+
+      <div className="mx-auto max-w-2xl px-5 py-10">
+        <header className="text-center mb-7">
+          <h1 className="text-3xl md:text-4xl font-semibold tracking-wide">心燈測驗 · 找回內在的明</h1>
+          <p className="mt-2 text-sm opacity-80">透過 15 題，照見此刻的心境，看看求道能帶給你什麼幫助。</p>
+        </header>
+
+        {!finished ? (
+          <section className="rounded-2xl bg-white/70 backdrop-blur p-6 shadow-lg">
+            <div className="mb-4 flex items-center gap-3">
+              <Progress value={progress} />
+              <div className="text-xs opacity-70 whitespace-nowrap">第 {step + 1} / {total}</div>
+            </div>
+
+            <h2 className="text-xl font-medium mb-6 leading-relaxed">{QUESTIONS[step].text}</h2>
+
+            <div className="grid gap-3">
+              {QUESTIONS[step].choices.map((c, i) => (
+                <button
+                  key={i}
+                  onClick={() => onChoose(c.to)}
+                  className="rounded-xl border border-black/10 bg-white/90 hover:bg-white transition p-3 text-left"
+                >
+                  {c.label}
+                </button>
+              ))}
+            </div>
+          </section>
+        ) : (
+          <section className="rounded-2xl bg-white/75 backdrop-blur p-6 shadow-lg">
+            <h2 className="text-2xl font-semibold">{LIGHTS[bestKey].title}</h2>
+            <p className="text-sm opacity-80 mt-1">{LIGHTS[bestKey].subtitle}</p>
+            <p className="mt-4 leading-relaxed">{LIGHTS[bestKey].insight}</p>
+
+            <div className="mt-6 flex flex-wrap gap-3">
+              <button
+                onClick={reset}
+                className="rounded-xl px-4 py-2 bg-black text-white"
+              >
+                重新測驗
+              </button>
+              <a
+                className="rounded-xl px-4 py-2 border border-black/10 bg-white/80"
+                href="#more"
+              >
+                什麼是「求道點心燈」？
+              </a>
+            </div>
+
+            <div className="mt-8 text-sm">
+              <div className="opacity-70 mb-2">你的作答分佈</div>
+              <ul className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {ORDER.map((k) => (
+                  <li key={k} className="flex items-center gap-2">
+                    <span className={`inline-block h-2 w-2 rounded-full bg-black`} />
+                    <span className="opacity-80">{LIGHTS[k].title}：{score[k]}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        )}
+
+        <footer className="mt-8 text-center text-xs opacity-70">
+          © {new Date().getFullYear()} 心燈 • All rights reserved.
+        </footer>
+      </div>
+    </main>
   );
 }
