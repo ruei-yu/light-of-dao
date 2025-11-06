@@ -2,17 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 背景：柔和的放射漸層 + 底色（相容版） */
-:root {
-  /* 改為單行，座標改 70% 0%（避免負值） */
-  --bg1: radial-gradient(1200px 800px at 70% 0%, rgba(255,255,255,0.9), rgba(255,255,255,0.7) 40%, transparent 70%);
-  --bg2: linear-gradient(180deg, #f7fbff 0%, #f8fafc 40%, #ffffff 100%);
-}
-
+/* 極簡、最相容的背景（只有一個 linear-gradient） */
 html, body {
   @apply h-full text-slate-800 antialiased;
-  background-color: #f7fafc;              /* 後備純色 */
-  background: var(--bg1), var(--bg2);     /* 兩層背景 */
+  background: linear-gradient(180deg, #f7fbff 0%, #f8fafc 40%, #ffffff 100%);
 }
 
 /* 常用樣式工具 */
