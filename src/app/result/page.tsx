@@ -5,11 +5,8 @@ import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-// ✅ 動態載入 Radar，禁用 SSR
-const Radar = dynamic(
-  () => import('react-chartjs-2').then((mod) => mod.Radar),
-  { ssr: false }
-)
+// ✅ 僅在瀏覽器載入 Radar，禁用 SSR
+const Radar = dynamic(() => import('react-chartjs-2').then((m) => m.Radar), { ssr: false })
 
 import {
   Chart as ChartJS,
@@ -67,8 +64,8 @@ type ResultPayload = {
 }
 
 export default function ResultPage() {
-  const [data, setData] = useState<ResultPayload | null>(null)
   const [mounted, setMounted] = useState(false)
+  const [data, setData] = useState<ResultPayload | null>(null)
 
   useEffect(() => {
     setMounted(true)
@@ -81,14 +78,20 @@ export default function ResultPage() {
         }
       }
     } catch (err) {
-      console.error('讀取結果失敗：', err)
+      console.error('Failed to read result:', err)
     }
   }, [])
 
-  // ✅ 若尚未 mounted，回傳空頁防止 Hydration mismatch
-  if (!mounted) return null
+  // ✅ 1️⃣ 尚未載入任何資料時 → 顯示 loading 畫面（避免 SSR mismatch）
+  if (!mounted) {
+    return (
+      <main className="min-h-screen flex flex-col items-center justify-center text-slate-700">
+        <div className="animate-pulse text-lg">載入中...</div>
+      </main>
+    )
+  }
 
-  // 沒資料時
+  // ✅ 2️⃣ 沒有測驗資料 → 顯示提示
   if (!data) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center px-6 py-10">
@@ -103,37 +106,44 @@ export default function ResultPage() {
     )
   }
 
+  // ✅ 3️⃣ 已載入 → 正常顯示內容
   const { score, bestKey, answers } = data
-  const total = answers.length || 0
   const sorted = LABELS.map((k, i) => ({ key: k, value: score[i] ?? 0 })).sort((a, b) => b.value - a.value)
   const top = sorted[0]
   const icon = ICONS[bestKey] ?? ICONS['安心之光']
+  const total = answers.length
 
-  const chartData = useMemo(() => ({
-    labels: LABELS,
-    datasets: [
-      {
-        label: '你的六光分佈',
-        data: score,
-        borderColor: '#334155',
-        backgroundColor: 'rgba(51,65,85,0.15)',
-        borderWidth: 2,
-      },
-    ],
-  }), [score])
+  const chartData = useMemo(
+    () => ({
+      labels: LABELS,
+      datasets: [
+        {
+          label: '你的六光分佈',
+          data: score,
+          borderColor: '#334155',
+          backgroundColor: 'rgba(51,65,85,0.15)',
+          borderWidth: 2,
+        },
+      ],
+    }),
+    [score]
+  )
 
-  const chartOptions = useMemo(() => ({
-    responsive: true,
-    plugins: { legend: { display: false } },
-    scales: {
-      r: {
-        beginAtZero: true,
-        ticks: { stepSize: 1, color: '#475569' },
-        grid: { circular: true, color: 'rgba(0,0,0,0.08)' },
-        pointLabels: { color: '#475569', font: { size: 13 } },
+  const chartOptions = useMemo(
+    () => ({
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        r: {
+          beginAtZero: true,
+          ticks: { stepSize: 1, color: '#475569' },
+          grid: { circular: true, color: 'rgba(0,0,0,0.08)' },
+          pointLabels: { color: '#475569', font: { size: 13 } },
+        },
       },
-    },
-  }), [])
+    }),
+    []
+  )
 
   return (
     <main className="min-h-screen px-6 py-10 sm:px-10">
@@ -156,7 +166,7 @@ export default function ResultPage() {
         <section className="mt-8 grid gap-6 md:grid-cols-2">
           <div className="rounded-2xl bg-white/80 p-6 shadow-md ring-1 ring-black/5 backdrop-blur">
             <h3 className="mb-4 text-lg font-semibold">六光雷達圖</h3>
-            {mounted && data && <Radar data={chartData} options={chartOptions} />}
+            {mounted && <Radar data={chartData} options={chartOptions} />}
           </div>
 
           <div className="rounded-2xl bg-white/80 p-6 shadow-md ring-1 ring-black/5 backdrop-blur">
@@ -168,18 +178,9 @@ export default function ResultPage() {
               </li>
               <li className="flex items-center justify-between border-b border-slate-200/60 pb-2">
                 <span className="text-slate-600">最高分光</span>
-                <span className="font-medium">{top.key}（{top.value}）</span>
-              </li>
-              <li className="pt-2">
-                <div className="text-slate-600 mb-2">分數明細（高→低）</div>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                  {sorted.map((s) => (
-                    <div key={s.key} className="rounded-xl border border-slate-200/70 p-3 text-center">
-                      <div className="text-sm text-slate-500">{s.key}</div>
-                      <div className="text-xl font-bold">{s.value}</div>
-                    </div>
-                  ))}
-                </div>
+                <span className="font-medium">
+                  {top.key}（{top.value}）
+                </span>
               </li>
             </ul>
           </div>
@@ -191,9 +192,7 @@ export default function ResultPage() {
           </Link>
           <button
             onClick={() => {
-              if (typeof navigator !== 'undefined' && navigator.clipboard) {
-                navigator.clipboard.writeText(window.location.origin)
-              }
+              if (navigator.clipboard) navigator.clipboard.writeText(window.location.origin)
             }}
             className="rounded-xl px-5 py-2 ring-1 ring-black/10 text-slate-700"
           >
