@@ -4,12 +4,13 @@
 
 /* 背景：柔和的放射漸層 + 細網格 */
 :root {
-  --bg: radial-gradient(1200px 800px at 70% -10%, rgba(255,255,255,0.9), rgba(255,255,255,0.7) 40%, transparent 70%),
-        linear-gradient(180deg, #f7fbff 0%, #f8fafc 40%, #fff 100%);
+  --bg1: radial-gradient(1200px 800px at 70% -10%, rgba(255,255,255,0.9), rgba(255,255,255,0.7) 40%, transparent 70%);
+  --bg2: linear-gradient(180deg, #f7fbff 0%, #f8fafc 40%, #fff 100%);
 }
+
 html, body {
   @apply h-full text-slate-800 antialiased;
-  background: var(--bg);
+  background: var(--bg1), var(--bg2);
 }
 
 .container-narrow {
