@@ -4,10 +4,12 @@
 
 /* 背景：柔和的放射漸層 + 底色（拆兩層以提高相容性） */
 :root {
-  --bg1: radial-gradient(1200px 800px at 70% -10%,
-          rgba(255,255,255,0.9),
-          rgba(255,255,255,0.7) 40%,
-          transparent 70%);
+  --bg1: radial-gradient(
+    1200px 800px at 70% -10%,
+    rgba(255,255,255,0.9),
+    rgba(255,255,255,0.7) 40%,
+    transparent 70%
+  );
   --bg2: linear-gradient(180deg, #f7fbff 0%, #f8fafc 40%, #ffffff 100%);
 }
 
