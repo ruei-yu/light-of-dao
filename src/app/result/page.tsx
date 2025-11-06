@@ -1,9 +1,14 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Radar } from 'react-chartjs-2'
+const Radar = dynamic(
+  () => import('react-chartjs-2').then((mod) => mod.Radar),
+  { ssr: false }
+)
+
 import {
   Chart as ChartJS,
   RadialLinearScale,
