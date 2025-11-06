@@ -1,17 +1,39 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-/* 極簡、最相容的背景（單一 linear-gradient） */
-html, body {
-  @apply h-full text-slate-800 antialiased;
-  background: linear-gradient(180deg, #f7fbff 0%, #f8fafc 40%, #ffffff 100%);
+/* v4 全域樣式 */
+@layer base {
+  html, body {
+    height: 100%;
+    color: var(--color-slate-800);
+    -webkit-font-smoothing: antialiased;
+    background: linear-gradient(180deg,#f7fbff 0%,#f8fafc 40%,#ffffff 100%);
+  }
 }
 
-/* 共用小工具 */
-.container-narrow { @apply max-w-3xl mx-auto px-4 sm:px-6 lg:px-8; }
-.card            { @apply rounded-2xl bg-white/80 backdrop-blur shadow-md ring-1 ring-black/5; }
-.btn             { @apply inline-flex items-center justify-center rounded-xl px-4 py-3 text-base font-medium transition hover:shadow-md active:scale-[0.99]; }
-.btn-primary     { @apply bg-slate-900 text-white hover:bg-slate-800; }
-.option          { @apply card p-4 text-left cursor-pointer transition hover:-translate-y-[1px] hover:shadow-lg; }
-.option-selected { @apply ring-2 ring-slate-900/70 shadow-lg bg-white; }
+/* 自訂元件樣式 — 只 @apply 內建 utility，不再互相引用自訂 class */
+@layer components {
+  .container-narrow {
+    @apply max-w-3xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .card {
+    @apply rounded-2xl bg-white/80 backdrop-blur shadow-md ring-1 ring-black/5;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center rounded-xl px-4 py-3 text-base font-medium transition hover:shadow-md active:scale-[0.99];
+  }
+
+  .btn-primary {
+    @apply bg-slate-900 text-white hover:bg-slate-800;
+  }
+
+  .option {
+    @apply rounded-2xl bg-white/80 backdrop-blur shadow-md ring-1 ring-black/5
+           p-4 text-left cursor-pointer transition hover:-translate-y-[1px] hover:shadow-lg;
+  }
+
+  .option-selected {
+    @apply ring-2 ring-slate-900/70 shadow-lg bg-white;
+  }
+}
