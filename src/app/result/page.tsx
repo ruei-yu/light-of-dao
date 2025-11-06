@@ -4,6 +4,8 @@ import dynamic from 'next/dynamic'
 import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+
+// ✅ 動態載入 Radar，禁用 SSR，避免伺服端錯誤
 const Radar = dynamic(
   () => import('react-chartjs-2').then((mod) => mod.Radar),
   { ssr: false }
@@ -21,11 +23,11 @@ import {
 
 ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend)
 
-// 六個光
-const LABELS = ['安心之光','力行之光','洞察之光','圓融之光','喜悅之光','發心之光'] as const
+// 六個光（固定順序）
+const LABELS = ['安心之光', '力行之光', '洞察之光', '圓融之光', '喜悅之光', '發心之光'] as const
 type Key = typeof LABELS[number]
 
-// 你的六個圖示（把檔案放 public/icons 下；檔名可自訂）
+// 六光圖示與文案
 const ICONS: Record<Key, { src: string; color: string; note: string }> = {
   安心之光: {
     src: '/icons/peace.png',
@@ -60,31 +62,32 @@ const ICONS: Record<Key, { src: string; color: string; note: string }> = {
 }
 
 type ResultPayload = {
-  score: number[]        // 長度6的分數陣列
+  score: number[] // 六光分數
   bestIndex: number
   bestKey: Key
-  answers: number[]      // 每題選了哪個選項（0~5）
+  answers: number[]
 }
 
 export default function ResultPage() {
   const [data, setData] = useState<ResultPayload | null>(null)
 
+  // ✅ 僅在客戶端存取 sessionStorage
   useEffect(() => {
+    if (typeof window === 'undefined') return
     try {
       const raw = sessionStorage.getItem('lod_result')
       if (raw) {
         const parsed = JSON.parse(raw)
-        // 輕量驗證
         if (Array.isArray(parsed?.score) && parsed.score.length === 6) {
           setData(parsed)
         }
       }
-    } catch (e) {
-      console.error('parse result failed', e)
+    } catch (err) {
+      console.error('讀取結果時發生錯誤：', err)
     }
   }, [])
 
-  // 如果沒有資料，提示回首頁
+  // 沒資料就提示回首頁
   if (!data) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center px-6 py-10">
@@ -99,47 +102,45 @@ export default function ResultPage() {
     )
   }
 
-  const { score, bestIndex, bestKey, answers } = data
+  const { score, bestKey, answers } = data
   const total = answers.length || score.reduce((a, b) => a + b, 0) || 1
 
-  // 雷達圖資料
-  const chartData = useMemo(() => {
-    return {
+  // 雷達圖資料（防呆）
+  const chartData = useMemo(
+    () => ({
       labels: LABELS,
       datasets: [
         {
           label: '你的六光分佈',
-          data: score,
+          data: score ?? [0, 0, 0, 0, 0, 0],
           borderWidth: 2,
+          borderColor: '#334155',
+          backgroundColor: 'rgba(51,65,85,0.15)',
           fill: true,
         },
       ],
-    }
-  }, [score])
+    }),
+    [score]
+  )
 
-  const chartOptions = useMemo(() => {
-    return {
+  const chartOptions = useMemo(
+    () => ({
       responsive: true,
-      plugins: {
-        legend: { display: false },
-        tooltip: { enabled: true },
-      },
+      plugins: { legend: { display: false } },
       scales: {
         r: {
           beginAtZero: true,
-          ticks: { stepSize: 1 },
-          grid: { circular: true },
-          angleLines: { color: 'rgba(0,0,0,0.08)' },
+          ticks: { stepSize: 1, color: '#475569' },
+          grid: { circular: true, color: 'rgba(0,0,0,0.08)' },
+          pointLabels: { color: '#475569', font: { size: 13 } },
         },
       },
-    } as const
-  }, [])
+    }),
+    []
+  )
 
-  // 排序後的統計（從高到低）
-  const sorted = LABELS
-    .map((k, i) => ({ key: k, value: score[i] ?? 0 }))
-    .sort((a, b) => b.value - a.value)
-
+  // 排序統計
+  const sorted = LABELS.map((k, i) => ({ key: k, value: score[i] ?? 0 })).sort((a, b) => b.value - a.value)
   const top = sorted[0]
   const icon = ICONS[bestKey] ?? ICONS['安心之光']
 
@@ -152,7 +153,7 @@ export default function ResultPage() {
           <p className="text-slate-600">以下是你的測驗結果與六光分佈</p>
         </div>
 
-        {/* 主結果卡片 */}
+        {/* 主結果卡 */}
         <section className="mx-auto max-w-2xl rounded-2xl bg-white/80 p-6 shadow-md ring-1 ring-black/5 backdrop-blur text-center">
           <div className="mb-4 flex justify-center">
             <Image src={icon.src} alt={bestKey} width={120} height={120} />
@@ -167,7 +168,7 @@ export default function ResultPage() {
         <section className="mt-8 grid gap-6 md:grid-cols-2">
           <div className="rounded-2xl bg-white/80 p-6 shadow-md ring-1 ring-black/5 backdrop-blur">
             <h3 className="mb-4 text-lg font-semibold">六光雷達圖</h3>
-            <Radar data={chartData} options={chartOptions} />
+            {data && <Radar data={chartData} options={chartOptions} />}
           </div>
 
           <div className="rounded-2xl bg-white/80 p-6 shadow-md ring-1 ring-black/5 backdrop-blur">
@@ -179,10 +180,12 @@ export default function ResultPage() {
               </li>
               <li className="flex items-center justify-between border-b border-slate-200/60 pb-2">
                 <span className="text-slate-600">最高分光</span>
-                <span className="font-medium">{top.key}（{top.value}）</span>
+                <span className="font-medium">
+                  {top.key}（{top.value}）
+                </span>
               </li>
               <li className="pt-2">
-                <div className="text-slate-600 mb-2">分數明細（高→低）</div>
+                <div className="text-slate-600 mb-2">分數明細（高 → 低）</div>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {sorted.map((s) => (
                     <div
@@ -200,17 +203,22 @@ export default function ResultPage() {
           </div>
         </section>
 
-        {/* 六光總覽（圖示 + 短文案） */}
+        {/* 六光導引 */}
         <section className="mt-8">
           <h3 className="mb-4 text-lg font-semibold">六光導引</h3>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {LABELS.map((k) => {
               const it = ICONS[k]
               return (
-                <div key={k} className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-black/5 backdrop-blur">
+                <div
+                  key={k}
+                  className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-black/5 backdrop-blur"
+                >
                   <div className="mb-3 flex items-center gap-3">
                     <Image src={it.src} alt={k} width={48} height={48} />
-                    <div className="text-base font-semibold" style={{ color: it.color }}>{k}</div>
+                    <div className="text-base font-semibold" style={{ color: it.color }}>
+                      {k}
+                    </div>
                   </div>
                   <p className="text-sm text-slate-700">{it.note}</p>
                 </div>
@@ -219,15 +227,16 @@ export default function ResultPage() {
           </div>
         </section>
 
-        {/* 底部動作 */}
+        {/* 底部按鈕 */}
         <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
           <Link href="/" className="rounded-xl bg-slate-900 px-5 py-2 font-medium text-white">
             再測一次
           </Link>
           <button
             onClick={() => {
-              if (!navigator?.clipboard) return
-              navigator.clipboard.writeText(window.location.origin)
+              if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                navigator.clipboard.writeText(window.location.origin)
+              }
             }}
             className="rounded-xl px-5 py-2 ring-1 ring-black/10 text-slate-700"
             title="複製分享連結"
