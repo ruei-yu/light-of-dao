@@ -2,39 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 背景：柔和的放射漸層 + 細網格 */
+/* 背景：柔和的放射漸層 + 漸層底色（拆兩層以相容建置器） */
 :root {
   --bg1: radial-gradient(1200px 800px at 70% -10%, rgba(255,255,255,0.9), rgba(255,255,255,0.7) 40%, transparent 70%);
-  --bg2: linear-gradient(180deg, #f7fbff 0%, #f8fafc 40%, #fff 100%);
+  --bg2: linear-gradient(180deg, #f7fbff 0%, #f8fafc 40%, #ffffff 100%);
 }
 
 html, body {
   @apply h-full text-slate-800 antialiased;
+  /* 先給瀏覽器一個安全的純色背景（fallback），再套兩層背景圖 */
+  background-color: #f7fafc;
   background: var(--bg1), var(--bg2);
 }
 
-.container-narrow {
-  @apply max-w-3xl mx-auto px-4 sm:px-6 lg:px-8;
-}
-
-.card {
-  @apply rounded-2xl bg-white/80 backdrop-blur shadow-md ring-1 ring-black/5;
-}
-
-.btn {
-  @apply inline-flex items-center justify-center rounded-xl px-4 py-3 text-base font-medium transition
-         hover:shadow-md active:scale-[0.99];
-}
-
-.btn-primary {
-  @apply bg-slate-900 text-white hover:bg-slate-800;
-}
-
-.option {
-  @apply card p-4 text-left cursor-pointer transition
-         hover:-translate-y-[1px] hover:shadow-lg;
-}
-
-.option-selected {
-  @apply ring-2 ring-slate-900/70 shadow-lg bg-white;
-}
+/* 版面常用工具 */
+.container-narrow { @apply max-w-3xl mx-auto px-4 sm:px-6 lg:px-8; }
+.card            { @apply rounded-2xl bg-white/80 backdrop-blur shadow-md ring-1 ring-black/5; }
+.btn             { @apply inline-flex items-center justify-center rounded-xl px-4 py-3 text-base font-medium transition hover:shadow-md active:scale-[0.99]; }
+.btn-primary     { @apply bg-slate-900 text-white hover:bg-slate-800; }
+.option          { @apply card p-4 text-left cursor-pointer transition hover:-translate-y-[1px] hover:shadow-lg; }
+.option-selected { @apply ring-2 ring-slate-900/70 shadow-lg bg-white; }
