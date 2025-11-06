@@ -2,13 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 極簡、最相容的背景（只有一個 linear-gradient） */
+/* 極簡、最相容的背景（單一 linear-gradient） */
 html, body {
   @apply h-full text-slate-800 antialiased;
   background: linear-gradient(180deg, #f7fbff 0%, #f8fafc 40%, #ffffff 100%);
 }
 
-/* 常用樣式工具 */
+/* 共用小工具 */
 .container-narrow { @apply max-w-3xl mx-auto px-4 sm:px-6 lg:px-8; }
 .card            { @apply rounded-2xl bg-white/80 backdrop-blur shadow-md ring-1 ring-black/5; }
 .btn             { @apply inline-flex items-center justify-center rounded-xl px-4 py-3 text-base font-medium transition hover:shadow-md active:scale-[0.99]; }

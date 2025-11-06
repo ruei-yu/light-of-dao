@@ -1,17 +1,15 @@
 import "./globals.css";
-import type { Metadata } from "next";
+import type { ReactNode } from "react";
 
-export const metadata: Metadata = {
-  title: "Light of Dao 心燈測驗",
-  description: "用 15 題探索你的當下需要哪一道心之光",
+export const metadata = {
+  title: "Light of Dao",
+  description: "心燈測驗 · 找回內在的明",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="zh-Hant">
-      <body className="min-h-dvh">
-        <main className="container-narrow py-10 sm:py-16">{children}</main>
-      </body>
+      <body className="min-h-screen">{children}</body>
     </html>
   );
 }
