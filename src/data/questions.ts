@@ -125,3 +125,4 @@ export const QUESTIONS: Question[] = [
     { label: "心有願，路自明", to: "FAXIN" },
   ]},
 ];
+export default QUESTIONS;
