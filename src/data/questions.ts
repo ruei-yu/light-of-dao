@@ -1,7 +1,10 @@
 import type { LightKey } from "@/data/results";
 
 export type Choice = { label: string; to: LightKey };
-export type Question = { id: number; text: string; choices: Choice[] };
+export type Question = {
+  title: string
+  options: string[]
+}
 
 export const QUESTIONS: Question[] = [
   { id: 1, text: "最近你最常感受到的狀態是？", choices: [
@@ -124,5 +127,6 @@ export const QUESTIONS: Question[] = [
     { label: "微笑吧，你的光正被喚醒", to: "XIYUE" },
     { label: "心有願，路自明", to: "FAXIN" },
   ]},
-];
-export default QUESTIONS;
+]
+
+export default QUESTIONS
