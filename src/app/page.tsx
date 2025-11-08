@@ -74,7 +74,7 @@ export default function Page() {
         >
           找到你此刻最需要的
           <span className="block mt-1 bg-gradient-to-r from-sky-600 to-indigo-600 bg-clip-text text-transparent">
-            「心之光」
+            「心光」
           </span>
         </motion.h1>
 
