@@ -86,7 +86,7 @@ export default function QuizPage() {
     <main className="min-h-screen px-6 py-10 sm:px-10">
       <div className="mx-auto max-w-3xl">
         <h1 className="mb-6 text-3xl font-bold leading-relaxed text-slate-900">
-          心燈測驗・找回內在的明
+          心燈測驗・找到你此刻最需要的「心之光」
         </h1>
 
         {ProgressBar}

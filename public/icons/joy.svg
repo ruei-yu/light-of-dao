@@ -1,0 +1,35 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="g" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#FFE58A" stop-opacity="1"></stop>
+      <stop offset="60%" stop-color="#FFD666" stop-opacity="0.75"></stop>
+      <stop offset="100%" stop-color="#FFC53D" stop-opacity="0"></stop>
+    </radialGradient>
+    <filter id="blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8"></feGaussianBlur>
+    </filter>
+  </defs>
+
+  <!-- 暈光 -->
+  <circle cx="64" cy="64" r="56" fill="url(#g)" filter="url(#blur)"></circle>
+
+  <!-- 太陽本體 -->
+  <circle cx="64" cy="64" r="28" fill="#FFE58A" stroke="#FDBA2C" stroke-width="2"></circle>
+
+  <!-- 放射光芒 -->
+  <g stroke="#FDBA2C" stroke-width="3" stroke-linecap="round">
+    <line x1="64" y1="18" x2="64" y2="8"></line>
+    <line x1="64" y1="120" x2="64" y2="110"></line>
+    <line x1="18" y1="64" x2="8" y2="64"></line>
+    <line x1="120" y1="64" x2="110" y2="64"></line>
+    <line x1="93" y1="35" x2="100" y2="28"></line>
+    <line x1="28" y1="100" x2="35" y2="93"></line>
+    <line x1="35" y1="35" x2="28" y2="28"></line>
+    <line x1="93" y1="93" x2="100" y2="100"></line>
+  </g>
+
+  <!-- 可愛表情 -->
+  <circle cx="54" cy="60" r="3.5" fill="#A16207"></circle>
+  <circle cx="74" cy="60" r="3.5" fill="#A16207"></circle>
+  <path d="M54 73 C60 80, 68 80, 74 73" stroke="#A16207" stroke-width="3" fill="none" stroke-linecap="round"></path>
+</svg>

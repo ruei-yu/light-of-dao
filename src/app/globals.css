@@ -1,39 +1,110 @@
 @import "tailwindcss";
 
-/* v4 全域樣式 */
+/* ===== v4 全域樣式 ===== */
 @layer base {
   html, body {
     height: 100%;
-    color: var(--color-slate-800);
+    color: rgb(15 23 42); /* slate-800 */
     -webkit-font-smoothing: antialiased;
-    background: linear-gradient(180deg,#f7fbff 0%,#f8fafc 40%,#ffffff 100%);
+    background: transparent !important;  /* ← 關鍵：不要再放白色漸層 */
+    position: relative;                   /* 建立堆疊環境 */
   }
 }
 
-/* 自訂元件樣式 — 只 @apply 內建 utility，不再互相引用自訂 class */
+
+/* ===== 元件設定 ===== */
 @layer components {
-  .container-narrow {
-    @apply max-w-3xl mx-auto px-4 sm:px-6 lg:px-8;
-  }
+  .container-narrow { @apply max-w-3xl mx-auto px-4 sm:px-6 lg:px-8; }
 
-  .card {
-    @apply rounded-2xl bg-white/80 backdrop-blur shadow-md ring-1 ring-black/5;
-  }
+  .card { @apply rounded-2xl bg-white/80 backdrop-blur shadow-md ring-1 ring-black/5; }
 
-  .btn {
-    @apply inline-flex items-center justify-center rounded-xl px-4 py-3 text-base font-medium transition hover:shadow-md active:scale-[0.99];
-  }
+  .btn { @apply inline-flex items-center justify-center rounded-xl px-4 py-3 text-base font-medium transition hover:shadow-md active:scale-[0.99]; }
 
-  .btn-primary {
-    @apply bg-slate-900 text-white hover:bg-slate-800;
-  }
+  .btn-primary { @apply bg-slate-900 text-white hover:bg-slate-800; }
 
   .option {
     @apply rounded-2xl bg-white/80 backdrop-blur shadow-md ring-1 ring-black/5
            p-4 text-left cursor-pointer transition hover:-translate-y-[1px] hover:shadow-lg;
   }
 
-  .option-selected {
-    @apply ring-2 ring-slate-900/70 shadow-lg bg-white;
+  .option-selected { @apply ring-2 ring-slate-900/70 shadow-lg bg-white; }
+}
+
+/* ===== 柔和多彩暈染背景 ===== */
+.aura-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    /* 中央白色區 */
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,1) 0%, rgba(255,255,255,0.8) 25%, rgba(255,255,255,0) 60%),
+    /* 粉色（左上） */
+    radial-gradient(1200px 900px at 0% 0%, rgba(255,182,193,0.6) 0%, rgba(255,182,193,0) 70%),
+    /* 橘色（右上） */
+    radial-gradient(1200px 900px at 100% 0%, rgba(255,195,140,0.6) 0%, rgba(255,195,140,0) 70%),
+    /* 黃色（上中偏右） */
+    radial-gradient(1000px 800px at 60% -10%, rgba(255,250,180,0.6) 0%, rgba(255,250,180,0) 70%),
+    /* 綠色（下方） */
+    radial-gradient(1200px 900px at 50% 110%, rgba(180,255,210,0.5) 0%, rgba(180,255,210,0) 70%),
+    /* 藍色（左下） */
+    radial-gradient(1200px 900px at 0% 100%, rgba(173,216,230,0.6) 0%, rgba(173,216,230,0) 70%),
+    /* 紫色（右下） */
+    radial-gradient(1200px 900px at 100% 100%, rgba(216,191,255,0.6) 0%, rgba(216,191,255,0) 70%);
+  background-blend-mode: lighten;
+  filter: blur(40px) saturate(120%);
+  opacity: 1;
+}
+
+/* 網格層（可省略） */
+.aura-grid {
+  position: relative;
+  isolation: isolate;
+}
+.aura-grid::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(to right, rgba(2,6,23,0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(2,6,23,0.03) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+}
+
+/* 行動裝置：縮小模糊範圍以提效能 */
+@media (max-width: 640px) {
+  .aura-bg {
+    filter: blur(28px) saturate(115%);
+    opacity: 0.95;
   }
 }
+/* 全站固定單張柔彩背景（不會被 body 背景蓋掉） */
+html::before{
+  content:"";
+  position: fixed;
+  inset: 0;
+  z-index: 0;          /* 背景層 */
+  pointer-events: none;
+  background:
+    /* 輕微縱向色洗，去除接縫感 */
+    linear-gradient(180deg,
+      rgba(244,114,182,0.05) 0%,
+      rgba(251,146,60,0.04) 20%,
+      rgba(253,224,71,0.04) 40%,
+      rgba(52,211,153,0.04) 60%,
+      rgba(96,165,250,0.04) 80%,
+      rgba(192,132,252,0.05) 100%),
+    /* 四角＋上下六色暈染（視窗單位，整頁一張） */
+    radial-gradient(85vw 75vh at -10% -10%, rgba(255,182,193,0.70) 0%, rgba(255,182,193,0) 60%),
+    radial-gradient(85vw 75vh at 110% -10%, rgba(251,176,102,0.70) 0%, rgba(251,176,102,0) 60%),
+    radial-gradient(85vw 75vh at -10% 110%, rgba(160,200,255,0.70) 0%, rgba(160,200,255,0) 60%),
+    radial-gradient(85vw 75vh at 110% 110%, rgba(196,170,255,0.70) 0%, rgba(196,170,255,0) 60%),
+    radial-gradient(60vw 50vh at 50% -20%, rgba(255,245,157,0.70) 0%, rgba(255,245,157,0) 60%),
+    radial-gradient(60vw 50vh at 50% 120%, rgba(152,236,197,0.60) 0%, rgba(152,236,197,0) 60%);
+  background-repeat: no-repeat;
+  background-size: cover;
+  filter: blur(36px) saturate(116%);
+}
+

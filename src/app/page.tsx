@@ -1,139 +1,129 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import QUESTIONS from '@/data/questions'
+import Link from 'next/link'
+import { motion } from 'framer-motion'
 
-// 六個面向：安心 / 力行 / 洞察 / 圓融 / 喜悅 / 發心
-const DIMENSIONS = ['安心之光', '力行之光', '洞察之光', '圓融之光', '喜悅之光', '發心之光'] as const
+export default function Page() {
+  const lines = [
+    '每個人心裡都有一盞不滅的燈，',
+    '在喜悅、困惑、平靜與成長之間閃爍，',
+    '光的顏色也隨著心境而悄然變化。',
+    '或許，有一道色彩的光芒，正等待被點亮。',
+  ]
 
-export default function QuizPage() {
-  const router = useRouter()
-  const total = QUESTIONS.length
-
-  // 第幾題（0-based）
-  const [idx, setIdx] = useState(0)
-  // 各題選到哪個選項（0~5），未作答用 -1
-  const [answers, setAnswers] = useState<number[]>(
-    Array.from({ length: total }, () => -1)
-  )
-
-  const current = QUESTIONS[idx]
-  const percent = Math.round(((idx + 1) / total) * 100)
-  const canNext = answers[idx] !== -1
-
-  const selectOption = (optIndex: number) => {
-    setAnswers((prev) => {
-      const next = [...prev]
-      next[idx] = optIndex
-      return next
-    })
+  const container = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.15 } }
   }
 
-  const goPrev = () => {
-    if (idx > 0) setIdx((v) => v - 1)
+  const fadeUp = {
+    hidden: { opacity: 0, y: 10 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } }
   }
-
-  const finishAndGoResult = () => {
-    // 簡單計分：每題的 6 個選項分別加到 6 個面向
-    // 你之後要改配分，只要調整這裡的規則即可
-    const score = Array(6).fill(0) as number[]
-    answers.forEach((a) => {
-      if (a >= 0 && a < 6) score[a] += 1
-    })
-
-    // 找出最高分面向
-    const bestIndex = score.indexOf(Math.max(...score))
-    const bestKey = DIMENSIONS[bestIndex] ?? '安心之光'
-
-    // 存起來給 /result 用（也方便你之後換成 URL 參數或 API）
-    if (typeof window !== 'undefined') {
-      sessionStorage.setItem(
-        'lod_result',
-        JSON.stringify({ score, bestIndex, bestKey, answers })
-      )
-    }
-    router.push('/result')
-  }
-
-  const goNext = () => {
-    if (!canNext) return
-    if (idx < total - 1) {
-      setIdx((v) => v + 1)
-    } else {
-      // ✅ 最後一題按下去，直接進結果頁
-      finishAndGoResult()
-    }
-  }
-
-  // 這裡做個很簡單的進度條，避免依賴你自訂的 Progress 元件 props
-  const ProgressBar = useMemo(
-    () => (
-      <div className="w-full">
-        <div className="mb-2 text-sm text-slate-600">{`第 ${idx + 1} / ${total} 題`}</div>
-        <div className="h-2 w-full rounded-full bg-slate-200">
-          <div
-            className="h-2 rounded-full bg-slate-900 transition-[width] duration-300"
-            style={{ width: `${percent}%` }}
-          />
-        </div>
-      </div>
-    ),
-    [idx, percent, total]
-  )
 
   return (
-    <main className="min-h-screen px-6 py-10 sm:px-10">
-      <div className="mx-auto max-w-3xl">
-        <h1 className="mb-6 text-3xl font-bold leading-relaxed text-slate-900">
-          心燈測驗・找回內在的明
-        </h1>
+    <main className="relative min-h-screen flex items-center justify-center px-6 py-16 text-center text-slate-800 overflow-hidden">
+      {/* ✨ 內聯水彩暈染背景：六色從四周暈開、中心白亮 */}
+      <div
+        className="absolute inset-0"
+        style={{
+          pointerEvents: 'none',
+          zIndex: 0,
+          // 不用混合模式，直接堆多層徑向漸層
+          background: [
+            // 中央白色區（保留乾淨的文字區）
+            'radial-gradient(circle at 50% 50%, rgba(255,255,255,1) 0%, rgba(255,255,255,0.80) 26%, rgba(255,255,255,0) 60%)',
+            // 粉色：左上
+            'radial-gradient(1200px 900px at 0% 0%, rgba(255,182,193,0.70) 0%, rgba(255,182,193,0) 70%)',
+            // 橘色：右上
+            'radial-gradient(1200px 900px at 100% 0%, rgba(251,176,102,0.70) 0%, rgba(251,176,102,0) 70%)',
+            // 黃色：上方偏右
+            'radial-gradient(1000px 800px at 60% -10%, rgba(255,245,157,0.70) 0%, rgba(255,245,157,0) 70%)',
+            // 綠色：下方
+            'radial-gradient(1200px 900px at 50% 110%, rgba(152,236,197,0.60) 0%, rgba(152,236,197,0) 70%)',
+            // 藍色：左下
+            'radial-gradient(1200px 900px at 0% 100%, rgba(160,200,255,0.70) 0%, rgba(160,200,255,0) 70%)',
+            // 紫色：右下
+            'radial-gradient(1200px 900px at 100% 100%, rgba(196,170,255,0.70) 0%, rgba(196,170,255,0) 70%)',
+          ].join(','),
+          filter: 'blur(40px) saturate(118%)',
+          opacity: 1,
+        }}
+      />
 
-        {ProgressBar}
+      {/* 內容層（在暈染上方顯示） */}
+      <motion.div
+        className="relative z-10 mx-auto max-w-3xl"
+        initial="hidden"
+        animate="show"
+        variants={container}
+      >
+        {/* 小標 */}
+        <motion.div
+          variants={fadeUp}
+          className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-sm ring-1 ring-black/5 backdrop-blur"
+        >
+          <span>✨ Light of Dao</span>
+          <span className="text-slate-500">心燈小測驗</span>
+        </motion.div>
 
-        <section className="mt-8 rounded-2xl bg-white/80 p-5 shadow-md ring-1 ring-black/5 backdrop-blur">
-          <h2 className="mb-4 text-xl font-semibold text-slate-900">{current.title}</h2>
+        {/* 標題 */}
+        <motion.h1
+          variants={fadeUp}
+          className="mt-6 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl leading-snug"
+        >
+          找到你此刻最需要的
+          <span className="block mt-1 bg-gradient-to-r from-sky-600 to-indigo-600 bg-clip-text text-transparent">
+            「心之光」
+          </span>
+        </motion.h1>
 
-          <div className="space-y-3">
-            {current.options.map((opt, i) => {
-              const selected = answers[idx] === i
-              return (
-                <button
-                  key={i}
-                  onClick={() => selectOption(i)}
-                  className={[
-                    'w-full text-left rounded-xl px-4 py-3 transition',
-                    'bg-white hover:-translate-y-[1px] hover:shadow-lg',
-                    selected
-                      ? 'ring-2 ring-slate-900/70 shadow-lg'
-                      : 'ring-1 ring-black/5',
-                  ].join(' ')}
-                >
-                  {opt}
-                </button>
-              )
-            })}
-          </div>
+        {/* 導入文字：逐行淡入 */}
+        <motion.div variants={fadeUp} className="mt-6 text-slate-600 leading-8">
+          <motion.div variants={container} className="space-y-1">
+            {lines.map((line, i) => (
+              <motion.span key={i} variants={fadeUp} className="block">
+                {line}
+              </motion.span>
+            ))}
+          </motion.div>
+        </motion.div>
 
-          <div className="mt-6 flex items-center justify-between">
-            <button
-              onClick={goPrev}
-              disabled={idx === 0}
-              className="rounded-xl px-4 py-2 text-slate-700 ring-1 ring-black/10 disabled:opacity-40"
-            >
-              上一題
-            </button>
+        {/* 說明 */}
+        <motion.p variants={fadeUp} className="mt-6 text-slate-600 leading-7">
+          現在，讓我們透過 15 道題直覺選擇，<br />
+          一起找出——此刻你最需要的那道光。<br />
+          測驗結束後將呈現你的「六光分佈」雷達圖與引導文字。
+        </motion.p>
 
-            <button
-              onClick={goNext}
-              disabled={!canNext}
-              className="rounded-xl bg-slate-900 px-5 py-2 font-medium text-white disabled:opacity-50"
-            >
-              {idx < total - 1 ? '下一題' : '看結果'}
-            </button>
-          </div>
+        {/* 按鈕 */}
+        <motion.div variants={fadeUp} className="mt-8 flex flex-wrap items-center justify-center gap-4">
+          <motion.div whileHover={{ scale: 1.02 }}>
+            <Link href="/quiz" className="rounded-xl bg-slate-900 px-6 py-3 text-white font-medium hover:bg-slate-800 transition">
+              立即開始測驗
+            </Link>
+          </motion.div>
+          <motion.div whileHover={{ scale: 1.02 }}>
+            <a href="#about" className="rounded-xl px-6 py-3 ring-1 ring-black/10 text-slate-700 hover:bg-white/60 transition">
+              了解內容
+            </a>
+          </motion.div>
+        </motion.div>
+
+        {/* 卡片 */}
+        <section id="about" className="mt-16 grid gap-4 sm:grid-cols-3 text-left">
+          {[
+            { title: '🌿 溫和引導', text: '問題設計以日常情境出發，協助你輕柔覺察，不做對錯評分。' },
+            { title: '🌞 六光分佈', text: '安心、力行、洞察、圓融、喜悅、信念——以雷達圖呈現心性平衡。' },
+            { title: '💫 行動建議', text: '完成後提供溫暖的文字與方向建議，幫助你穩穩前行。' }
+          ].map((card, i) => (
+            <motion.div key={i} variants={fadeUp} whileHover={{ y: -2 }} className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-black/5 backdrop-blur">
+              <div className="text-sm font-semibold text-slate-700">{card.title}</div>
+              <p className="mt-2 text-sm text-slate-600">{card.text}</p>
+            </motion.div>
+          ))}
         </section>
-      </div>
+      </motion.div>
     </main>
   )
 }

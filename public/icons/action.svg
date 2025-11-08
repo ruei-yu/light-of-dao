@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <!-- Figure fill (soft vertical gradient) -->
+    <linearGradient id="fillBlue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7FD6FF"/>
+      <stop offset="100%" stop-color="#58C1FF"/>
+    </linearGradient>
+
+    <!-- Soft blue glow behind the runner (no edge bleed) -->
+    <radialGradient id="blueGlow" cx="48%" cy="38%" r="42%">
+      <stop offset="0%" stop-color="#8DE3FF" stop-opacity="0.85"/>
+      <stop offset="70%" stop-color="#8DE3FF" stop-opacity="0.30"/>
+      <stop offset="100%" stop-color="#8DE3FF" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- For nice rounded corners on joins -->
+    <style>
+      .part { fill: url(#fillBlue); }
+    </style>
+  </defs>
+
+  <!-- transparent background; draw glow behind the figure -->
+  <circle cx="492" cy="380" r="360" fill="url(#blueGlow)"/>
+
+  <!-- RUNNER: pure vector shapes, no stroke -->
+  <!-- Head -->
+  <circle cx="560" cy="300" r="110" class="part"/>
+
+  <!-- Torso (rounded diamond-like) -->
+  <path class="part" d="M345 470
+                         C420 420, 520 410, 605 450
+                         C655 475, 690 520, 720 560
+                         C650 575, 600 600, 520 620
+                         C430 645, 360 610, 330 555
+                         C320 525, 325 495, 345 470Z"/>
+
+  <!-- Right arm (forward) -->
+  <path class="part" d="M640 500
+                         C700 455, 760 455, 800 500
+                         C820 525, 820 560, 800 585
+                         C770 620, 710 615, 665 575
+                         C640 552, 630 525, 640 500Z"/>
+
+  <!-- Left arm (back) -->
+  <path class="part" d="M360 520
+                         C320 540, 300 565, 290 600
+                         C280 635, 302 662, 338 668
+                         C382 676, 420 650, 435 615
+                         C450 578, 430 545, 400 528
+                         C385 520, 372 518, 360 520Z"/>
+
+  <!-- Right thigh -->
+  <path class="part" d="M480 640
+                         C520 610, 585 600, 650 620
+                         C690 635, 710 670, 705 705
+                         C700 745, 670 770, 635 770
+                         C590 770, 545 745, 510 710
+                         C485 685, 470 660, 480 640Z"/>
+
+  <!-- Right calf + foot -->
+  <path class="part" d="M620 760
+                         C650 780, 675 830, 685 880
+                         C692 915, 670 950, 630 955
+                         C595 958, 560 940, 540 910
+                         C520 880, 515 845, 530 805
+                         C545 770, 585 750, 620 760Z"/>
+
+  <!-- Left thigh (back) -->
+  <path class="part" d="M380 645
+                         C355 675, 320 700, 285 715
+                         C250 730, 230 760, 235 795
+                         C240 828, 268 850, 305 850
+                         C345 850, 388 828, 420 795
+                         C450 765, 470 735, 470 705
+                         C470 675, 455 655, 430 645
+                         C410 637, 395 637, 380 645Z"/>
+
+  <!-- Left calf + foot (back) -->
+  <path class="part" d="M300 820
+                         C330 840, 380 850, 420 840
+                         C452 833, 480 860, 480 895
+                         C480 925, 455 948, 418 952
+                         C375 956, 320 948, 285 930
+                         C250 912, 240 878, 255 845
+                         C265 822, 283 812, 300 820Z"/>
+
+</svg>
