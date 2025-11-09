@@ -126,21 +126,35 @@ html::before{
   }
 }
 
-/* === 封面 hero-section 背景（柔光擴散） === */
-.hero-section{
+/* === 封面 hero-section 背景（含柔光緩動動畫） === */
+@keyframes auraFloat {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.95;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+.hero-section {
   position: relative;
   isolation: isolate;
 }
-.hero-section > *{
+.hero-section > * {
   position: relative;
   z-index: 2;
 }
-.hero-section::before{
-  content:"";
+.hero-section::before {
+  content: "";
   position: absolute;
   inset: -6% -6%;
   z-index: 1;
   pointer-events: none;
+  transform-origin: center center;
+  animation: auraFloat 8s ease-in-out infinite;
+
   background:
     radial-gradient(circle at 50% 35%, rgba(255,255,255,1) 0%, rgba(255,255,255,0.85) 24%, rgba(255,255,255,0) 60%),
     radial-gradient(1200px 800px  at -10% -15%, rgba(255,182,193,0.45) 0%, rgba(255,182,193,0) 70%),
@@ -153,9 +167,12 @@ html::before{
   filter: blur(24px) saturate(116%);
   opacity: .95;
 }
-@media (max-width: 640px){
-  .hero-section::before{
+
+@media (max-width: 640px) {
+  .hero-section::before {
     inset: -8% -8%;
+    animation: auraFloat 10s ease-in-out infinite;
+    filter: blur(16px) saturate(112%);
     background:
       radial-gradient(circle at 50% 42%, rgba(255,255,255,1) 0%, rgba(255,255,255,0.86) 26%, rgba(255,255,255,0) 66%),
       radial-gradient(130vw 100vh at -25% -25%, rgba(255,182,193,0.40) 0%, rgba(255,182,193,0) 85%),
@@ -164,10 +181,10 @@ html::before{
       radial-gradient(115vw 90vh  at 50% 130%,  rgba(152,236,197,0.40) 0%, rgba(152,236,197,0) 85%),
       radial-gradient(130vw 100vh at -25% 125%, rgba(160,200,255,0.42) 0%, rgba(160,200,255,0) 85%),
       radial-gradient(130vw 100vh at 125% 125%, rgba(196,170,255,0.42) 0%, rgba(196,170,255,0) 85%);
-    filter: blur(16px) saturate(112%);
     opacity: .9;
   }
 }
+
 /* === 封面柔光緩動動畫（光暈呼吸感） === */
 @keyframes auraFloat {
   0%, 100% {
