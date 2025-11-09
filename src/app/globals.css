@@ -108,3 +108,57 @@ html::before{
   filter: blur(36px) saturate(116%);
 }
 
+
+/* === 補強：行動裝置的高度與版面穩定 === */
+@layer base {
+  html, body {
+    min-height: 100svh;      /* 動態小視窗單位，避免地址列影響高度 */
+    overflow-x: hidden;      /* 防止角落大半徑暈光造成水平捲動 */
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* === Aura：桌機不變，手機放大半徑、降低 blur 與疊加強度 === */
+@media (max-width: 640px) {
+  .aura-bg {
+    /* 取消過重的整體模糊，改用更大半徑的漸層來達成柔和 */
+    filter: blur(16px) saturate(112%);
+    opacity: 0.9;
+    background:
+      radial-gradient(circle at 50% 55%, rgba(255,255,255,1) 0%, rgba(255,255,255,0.85) 22%, rgba(255,255,255,0) 58%),
+      radial-gradient(120vw 95vh at -20% -20%, rgba(255,182,193,0.50) 0%, rgba(255,182,193,0) 78%),
+      radial-gradient(120vw 95vh at 120% -20%, rgba(251,176,102,0.50) 0%, rgba(251,176,102,0) 78%),
+      radial-gradient(120vw 95vh at 50% -30%,  rgba(255,250,180,0.46) 0%, rgba(255,250,180,0) 80%),
+      radial-gradient(130vw 100vh at 50% 130%, rgba(152,236,197,0.46) 0%, rgba(152,236,197,0) 80%),
+      radial-gradient(120vw 95vh at -20% 120%, rgba(160,200,255,0.50) 0%, rgba(160,200,255,0) 78%),
+      radial-gradient(120vw 95vh at 120% 120%, rgba(196,170,255,0.50) 0%, rgba(196,170,255,0) 78%);
+    background-blend-mode: lighten;
+  }
+}
+
+/* === html::before：手機專用配置，放大半徑、拉離中心、減少 blur === */
+@media (max-width: 640px) {
+  html::before{
+    /* fixed 仍保留，但把 blur 降低、半徑放大，避免「色塊擠在中間」 */
+    filter: blur(18px) saturate(112%);
+    background:
+      linear-gradient(180deg,
+        rgba(244,114,182,0.04) 0%,
+        rgba(251,146,60,0.035) 20%,
+        rgba(253,224,71,0.035) 40%,
+        rgba(52,211,153,0.035) 60%,
+        rgba(96,165,250,0.035) 80%,
+        rgba(192,132,252,0.04) 100%),
+      radial-gradient(120vw 100vh at -25% -25%, rgba(255,182,193,0.55) 0%, rgba(255,182,193,0) 82%),
+      radial-gradient(120vw 100vh at 125% -25%, rgba(251,176,102,0.55) 0%, rgba(251,176,102,0) 82%),
+      radial-gradient(120vw 100vh at -25% 125%, rgba(160,200,255,0.55) 0%, rgba(160,200,255,0) 82%),
+      radial-gradient(120vw 100vh at 125% 125%, rgba(196,170,255,0.55) 0%, rgba(196,170,255,0) 82%),
+      radial-gradient(95vw  80vh at 50% -35%,  rgba(255,245,157,0.55) 0%, rgba(255,245,157,0) 82%),
+      radial-gradient(95vw  80vh at 50% 135%,  rgba(152,236,197,0.48) 0%, rgba(152,236,197,0) 82%);
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+}
+
+/* === 疊層保險：主要內容在背景之上 === */
+.aura-grid { position: relative; isolation: isolate; z-index: 1; }
