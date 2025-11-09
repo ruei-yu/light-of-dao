@@ -4,29 +4,25 @@
 @layer base {
   html, body {
     height: 100%;
+    min-height: 100svh;      /* 避免 iOS 地址列壓縮背景 */
+    overflow-x: hidden;
     color: rgb(15 23 42); /* slate-800 */
     -webkit-font-smoothing: antialiased;
-    background: transparent !important;  /* ← 關鍵：不要再放白色漸層 */
-    position: relative;                   /* 建立堆疊環境 */
+    background: transparent !important;
+    position: relative;
   }
 }
-
 
 /* ===== 元件設定 ===== */
 @layer components {
   .container-narrow { @apply max-w-3xl mx-auto px-4 sm:px-6 lg:px-8; }
-
   .card { @apply rounded-2xl bg-white/80 backdrop-blur shadow-md ring-1 ring-black/5; }
-
   .btn { @apply inline-flex items-center justify-center rounded-xl px-4 py-3 text-base font-medium transition hover:shadow-md active:scale-[0.99]; }
-
   .btn-primary { @apply bg-slate-900 text-white hover:bg-slate-800; }
-
   .option {
     @apply rounded-2xl bg-white/80 backdrop-blur shadow-md ring-1 ring-black/5
            p-4 text-left cursor-pointer transition hover:-translate-y-[1px] hover:shadow-lg;
   }
-
   .option-selected { @apply ring-2 ring-slate-900/70 shadow-lg bg-white; }
 }
 
@@ -37,19 +33,12 @@
   pointer-events: none;
   z-index: 0;
   background:
-    /* 中央白色區 */
     radial-gradient(circle at 50% 50%, rgba(255,255,255,1) 0%, rgba(255,255,255,0.8) 25%, rgba(255,255,255,0) 60%),
-    /* 粉色（左上） */
     radial-gradient(1200px 900px at 0% 0%, rgba(255,182,193,0.6) 0%, rgba(255,182,193,0) 70%),
-    /* 橘色（右上） */
     radial-gradient(1200px 900px at 100% 0%, rgba(255,195,140,0.6) 0%, rgba(255,195,140,0) 70%),
-    /* 黃色（上中偏右） */
     radial-gradient(1000px 800px at 60% -10%, rgba(255,250,180,0.6) 0%, rgba(255,250,180,0) 70%),
-    /* 綠色（下方） */
     radial-gradient(1200px 900px at 50% 110%, rgba(180,255,210,0.5) 0%, rgba(180,255,210,0) 70%),
-    /* 藍色（左下） */
     radial-gradient(1200px 900px at 0% 100%, rgba(173,216,230,0.6) 0%, rgba(173,216,230,0) 70%),
-    /* 紫色（右下） */
     radial-gradient(1200px 900px at 100% 100%, rgba(216,191,255,0.6) 0%, rgba(216,191,255,0) 70%);
   background-blend-mode: lighten;
   filter: blur(40px) saturate(120%);
@@ -60,6 +49,7 @@
 .aura-grid {
   position: relative;
   isolation: isolate;
+  z-index: 1;
 }
 .aura-grid::before {
   content: "";
@@ -73,22 +63,14 @@
   pointer-events: none;
 }
 
-/* 行動裝置：縮小模糊範圍以提效能 */
-@media (max-width: 640px) {
-  .aura-bg {
-    filter: blur(28px) saturate(115%);
-    opacity: 0.95;
-  }
-}
-/* 全站固定單張柔彩背景（不會被 body 背景蓋掉） */
+/* 全站固定柔彩背景 */
 html::before{
   content:"";
   position: fixed;
   inset: 0;
-  z-index: 0;          /* 背景層 */
+  z-index: 0;
   pointer-events: none;
   background:
-    /* 輕微縱向色洗，去除接縫感 */
     linear-gradient(180deg,
       rgba(244,114,182,0.05) 0%,
       rgba(251,146,60,0.04) 20%,
@@ -96,7 +78,6 @@ html::before{
       rgba(52,211,153,0.04) 60%,
       rgba(96,165,250,0.04) 80%,
       rgba(192,132,252,0.05) 100%),
-    /* 四角＋上下六色暈染（視窗單位，整頁一張） */
     radial-gradient(85vw 75vh at -10% -10%, rgba(255,182,193,0.70) 0%, rgba(255,182,193,0) 60%),
     radial-gradient(85vw 75vh at 110% -10%, rgba(251,176,102,0.70) 0%, rgba(251,176,102,0) 60%),
     radial-gradient(85vw 75vh at -10% 110%, rgba(160,200,255,0.70) 0%, rgba(160,200,255,0) 60%),
@@ -108,20 +89,9 @@ html::before{
   filter: blur(36px) saturate(116%);
 }
 
-
-/* === 補強：行動裝置的高度與版面穩定 === */
-@layer base {
-  html, body {
-    min-height: 100svh;      /* 動態小視窗單位，避免地址列影響高度 */
-    overflow-x: hidden;      /* 防止角落大半徑暈光造成水平捲動 */
-    -webkit-font-smoothing: antialiased;
-  }
-}
-
-/* === Aura：桌機不變，手機放大半徑、降低 blur 與疊加強度 === */
+/* === 手機：柔和擴散 === */
 @media (max-width: 640px) {
   .aura-bg {
-    /* 取消過重的整體模糊，改用更大半徑的漸層來達成柔和 */
     filter: blur(16px) saturate(112%);
     opacity: 0.9;
     background:
@@ -134,12 +104,8 @@ html::before{
       radial-gradient(120vw 95vh at 120% 120%, rgba(196,170,255,0.50) 0%, rgba(196,170,255,0) 78%);
     background-blend-mode: lighten;
   }
-}
 
-/* === html::before：手機專用配置，放大半徑、拉離中心、減少 blur === */
-@media (max-width: 640px) {
   html::before{
-    /* fixed 仍保留，但把 blur 降低、半徑放大，避免「色塊擠在中間」 */
     filter: blur(18px) saturate(112%);
     background:
       linear-gradient(180deg,
@@ -153,12 +119,52 @@ html::before{
       radial-gradient(120vw 100vh at 125% -25%, rgba(251,176,102,0.55) 0%, rgba(251,176,102,0) 82%),
       radial-gradient(120vw 100vh at -25% 125%, rgba(160,200,255,0.55) 0%, rgba(160,200,255,0) 82%),
       radial-gradient(120vw 100vh at 125% 125%, rgba(196,170,255,0.55) 0%, rgba(196,170,255,0) 82%),
-      radial-gradient(95vw  80vh at 50% -35%,  rgba(255,245,157,0.55) 0%, rgba(255,245,157,0) 82%),
-      radial-gradient(95vw  80vh at 50% 135%,  rgba(152,236,197,0.48) 0%, rgba(152,236,197,0) 82%);
+      radial-gradient(95vw 80vh at 50% -35%,  rgba(255,245,157,0.55) 0%, rgba(255,245,157,0) 82%),
+      radial-gradient(95vw 80vh at 50% 135%,  rgba(152,236,197,0.48) 0%, rgba(152,236,197,0) 82%);
     background-size: cover;
     background-repeat: no-repeat;
   }
 }
 
-/* === 疊層保險：主要內容在背景之上 === */
-.aura-grid { position: relative; isolation: isolate; z-index: 1; }
+/* === 封面 hero-section 背景（柔光擴散） === */
+.hero-section{
+  position: relative;
+  isolation: isolate;
+}
+.hero-section > *{
+  position: relative;
+  z-index: 2;
+}
+.hero-section::before{
+  content:"";
+  position: absolute;
+  inset: -6% -6%;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 35%, rgba(255,255,255,1) 0%, rgba(255,255,255,0.85) 24%, rgba(255,255,255,0) 60%),
+    radial-gradient(1200px 800px  at -10% -15%, rgba(255,182,193,0.45) 0%, rgba(255,182,193,0) 70%),
+    radial-gradient(1200px 800px  at 110% -15%, rgba(251,176,102,0.45) 0%, rgba(251,176,102,0) 70%),
+    radial-gradient(1100px 750px  at 60% -20%,  rgba(255,250,180,0.40) 0%, rgba(255,250,180,0) 75%),
+    radial-gradient(1300px 900px  at 50% 115%,  rgba(152,236,197,0.42) 0%, rgba(152,236,197,0) 75%),
+    radial-gradient(1200px 850px  at -10% 110%, rgba(160,200,255,0.45) 0%, rgba(160,200,255,0) 70%),
+    radial-gradient(1200px 850px  at 110% 110%, rgba(196,170,255,0.45) 0%, rgba(196,170,255,0) 70%);
+  background-blend-mode: lighten;
+  filter: blur(24px) saturate(116%);
+  opacity: .95;
+}
+@media (max-width: 640px){
+  .hero-section::before{
+    inset: -8% -8%;
+    background:
+      radial-gradient(circle at 50% 42%, rgba(255,255,255,1) 0%, rgba(255,255,255,0.86) 26%, rgba(255,255,255,0) 66%),
+      radial-gradient(130vw 100vh at -25% -25%, rgba(255,182,193,0.40) 0%, rgba(255,182,193,0) 85%),
+      radial-gradient(130vw 100vh at 125% -25%, rgba(251,176,102,0.40) 0%, rgba(251,176,102,0) 85%),
+      radial-gradient(115vw 90vh  at 60% -30%,  rgba(255,250,180,0.38) 0%, rgba(255,250,180,0) 85%),
+      radial-gradient(115vw 90vh  at 50% 130%,  rgba(152,236,197,0.40) 0%, rgba(152,236,197,0) 85%),
+      radial-gradient(130vw 100vh at -25% 125%, rgba(160,200,255,0.42) 0%, rgba(160,200,255,0) 85%),
+      radial-gradient(130vw 100vh at 125% 125%, rgba(196,170,255,0.42) 0%, rgba(196,170,255,0) 85%);
+    filter: blur(16px) saturate(112%);
+    opacity: .9;
+  }
+}
