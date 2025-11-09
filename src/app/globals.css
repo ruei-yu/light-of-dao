@@ -168,3 +168,20 @@ html::before{
     opacity: .9;
   }
 }
+/* === 封面柔光緩動動畫（光暈呼吸感） === */
+@keyframes auraFloat {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.95;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+/* 套用在封面 hero-section 背景 */
+.hero-section::before {
+  animation: auraFloat 8s ease-in-out infinite;
+  transform-origin: center;
+}
