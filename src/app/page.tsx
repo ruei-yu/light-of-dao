@@ -22,108 +22,96 @@ export default function Page() {
   }
 
   return (
-    <main className="relative min-h-screen flex items-center justify-center px-6 py-16 text-center text-slate-800 overflow-hidden">
-      {/* ✨ 內聯水彩暈染背景：六色從四周暈開、中心白亮 */}
-      <div
-        className="absolute inset-0"
-        style={{
-          pointerEvents: 'none',
-          zIndex: 0,
-          // 不用混合模式，直接堆多層徑向漸層
-          background: [
-            // 中央白色區（保留乾淨的文字區）
-            'radial-gradient(circle at 50% 50%, rgba(255,255,255,1) 0%, rgba(255,255,255,0.80) 26%, rgba(255,255,255,0) 60%)',
-            // 粉色：左上
-            'radial-gradient(1200px 900px at 0% 0%, rgba(255,182,193,0.70) 0%, rgba(255,182,193,0) 70%)',
-            // 橘色：右上
-            'radial-gradient(1200px 900px at 100% 0%, rgba(251,176,102,0.70) 0%, rgba(251,176,102,0) 70%)',
-            // 黃色：上方偏右
-            'radial-gradient(1000px 800px at 60% -10%, rgba(255,245,157,0.70) 0%, rgba(255,245,157,0) 70%)',
-            // 綠色：下方
-            'radial-gradient(1200px 900px at 50% 110%, rgba(152,236,197,0.60) 0%, rgba(152,236,197,0) 70%)',
-            // 藍色：左下
-            'radial-gradient(1200px 900px at 0% 100%, rgba(160,200,255,0.70) 0%, rgba(160,200,255,0) 70%)',
-            // 紫色：右下
-            'radial-gradient(1200px 900px at 100% 100%, rgba(196,170,255,0.70) 0%, rgba(196,170,255,0) 70%)',
-          ].join(','),
-          filter: 'blur(40px) saturate(118%)',
-          opacity: 1,
-        }}
-      />
+    <main className="relative min-h-screen overflow-hidden text-slate-800">
+      {/* 封面區：底層柔彩由 globals.css 的 .hero-section::before */}
+      <section className="hero-section relative overflow-hidden flex items-center justify-center px-6 py-16 sm:py-28 text-center">
+        {/* 六色亮點閃爍層（請已在 globals.css 貼上 .hero-glow-layer 與 .glow-*） */}
+        <div className="hero-glow-layer" aria-hidden="true">
+          <div className="glow glow--pink" />
+          <div className="glow glow--orange" />
+          <div className="glow glow--yellow" />
+          <div className="glow glow--green" />
+          <div className="glow glow--blue" />
+          <div className="glow glow--purple" />
+        </div>
 
-      {/* 內容層（在暈染上方顯示） */}
-      <motion.div
-        className="relative z-10 mx-auto max-w-3xl"
-        initial="hidden"
-        animate="show"
-        variants={container}
-      >
-        {/* 小標 */}
+        {/* 中央白色呼吸光 */}
+        <div className="hero-glow" aria-hidden="true" />
+
+        {/* 內容層 */}
         <motion.div
-          variants={fadeUp}
-          className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-sm ring-1 ring-black/5 backdrop-blur"
+          className="container-narrow relative z-10 mx-auto"
+          initial="hidden"
+          animate="show"
+          variants={container}
         >
-          <span>✨ Light of Dao</span>
-          <span className="text-slate-500">心燈小測驗</span>
-        </motion.div>
-
-        {/* 標題 */}
-        <motion.h1
-          variants={fadeUp}
-          className="mt-6 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl leading-snug"
-        >
-          找到你此刻最需要的
-          <span className="block mt-1 bg-gradient-to-r from-sky-600 to-indigo-600 bg-clip-text text-transparent">
-            「心光」
-          </span>
-        </motion.h1>
-
-        {/* 導入文字：逐行淡入 */}
-        <motion.div variants={fadeUp} className="mt-6 text-slate-600 leading-8">
-          <motion.div variants={container} className="space-y-1">
-            {lines.map((line, i) => (
-              <motion.span key={i} variants={fadeUp} className="block">
-                {line}
-              </motion.span>
-            ))}
+          {/* 小標 */}
+          <motion.div
+            variants={fadeUp}
+            className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-sm ring-1 ring-black/5 backdrop-blur"
+          >
+            <span>✨ Light of Dao</span>
+            <span className="text-slate-500">心燈小測驗</span>
           </motion.div>
-        </motion.div>
 
-        {/* 說明 */}
-        <motion.p variants={fadeUp} className="mt-6 text-slate-600 leading-7">
-          現在，讓我們透過 15 道題直覺選擇，<br />
-          一起找出——此刻你最需要的那道光。<br />
-          測驗結束後將呈現你的「六光分佈」雷達圖與引導文字。
-        </motion.p>
+          {/* 標題 */}
+          <motion.h1
+            variants={fadeUp}
+            className="mt-6 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl leading-snug"
+          >
+            找到你此刻最需要的
+            <span className="block mt-1 bg-gradient-to-r from-sky-600 to-indigo-600 bg-clip-text text-transparent">
+              「心光」
+            </span>
+          </motion.h1>
 
-        {/* 按鈕 */}
-        <motion.div variants={fadeUp} className="mt-8 flex flex-wrap items-center justify-center gap-4">
-          <motion.div whileHover={{ scale: 1.02 }}>
-            <Link href="/quiz" className="rounded-xl bg-slate-900 px-6 py-3 text-white font-medium hover:bg-slate-800 transition">
-              立即開始測驗
-            </Link>
-          </motion.div>
-          <motion.div whileHover={{ scale: 1.02 }}>
-            <a href="#about" className="rounded-xl px-6 py-3 ring-1 ring-black/10 text-slate-700 hover:bg-white/60 transition">
-              了解內容
-            </a>
-          </motion.div>
-        </motion.div>
-
-        {/* 卡片 */}
-        <section id="about" className="mt-16 grid gap-4 sm:grid-cols-3 text-left">
-          {[
-            { title: '🌿 溫和引導', text: '問題設計以日常情境出發，協助你輕柔覺察，不做對錯評分。' },
-            { title: '🌞 六光分佈', text: '安心、力行、洞察、圓融、喜悅、信念——以雷達圖呈現心性平衡。' },
-            { title: '💫 行動建議', text: '完成後提供溫暖的文字與方向建議，幫助你穩穩前行。' }
-          ].map((card, i) => (
-            <motion.div key={i} variants={fadeUp} whileHover={{ y: -2 }} className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-black/5 backdrop-blur">
-              <div className="text-sm font-semibold text-slate-700">{card.title}</div>
-              <p className="mt-2 text-sm text-slate-600">{card.text}</p>
+          {/* 導入文字：逐行淡入 */}
+          <motion.div variants={fadeUp} className="mt-6 text-slate-600 leading-8">
+            <motion.div variants={container} className="space-y-1">
+              {lines.map((line, i) => (
+                <motion.span key={i} variants={fadeUp} className="block">
+                  {line}
+                </motion.span>
+              ))}
             </motion.div>
-          ))}
-        </section>
-      </motion.div>
+          </motion.div>
+
+          {/* 說明 */}
+          <motion.p variants={fadeUp} className="mt-6 text-slate-600 leading-7">
+            現在，讓我們透過 15 道題直覺選擇，<br />
+            一起找出——此刻你最需要的那道光。<br />
+            測驗結束後將呈現你的「六光分佈」雷達圖與引導文字。
+          </motion.p>
+
+          {/* 按鈕 */}
+          <motion.div variants={fadeUp} className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <motion.div whileHover={{ scale: 1.02 }}>
+              <Link href="/quiz" className="rounded-xl bg-slate-900 px-6 py-3 text-white font-medium hover:bg-slate-800 transition">
+                立即開始測驗
+              </Link>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.02 }}>
+              <a href="#about" className="rounded-xl px-6 py-3 ring-1 ring-black/10 text-slate-700 hover:bg-white/60 transition">
+                了解內容
+              </a>
+            </motion.div>
+          </motion.div>
+
+          {/* 卡片 */}
+          <section id="about" className="mt-16 grid gap-4 sm:grid-cols-3 text-left">
+            {[
+              { title: '🌿 溫和引導', text: '問題設計以日常情境出發，協助你輕柔覺察，不做對錯評分。' },
+              { title: '🌞 六光分佈', text: '安心、力行、洞察、圓融、喜悅、信念——以雷達圖呈現心性平衡。' },
+              { title: '💫 行動建議', text: '完成後提供溫暖的文字與方向建議，幫助你穩穩前行。' }
+            ].map((card, i) => (
+              <motion.div key={i} variants={fadeUp} whileHover={{ y: -2 }} className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-black/5 backdrop-blur">
+                <div className="text-sm font-semibold text-slate-700">{card.title}</div>
+                <p className="mt-2 text-sm text-slate-600">{card.text}</p>
+              </motion.div>
+            ))}
+          </section>
+        </motion.div>
+      </section>
     </main>
   )
 }
