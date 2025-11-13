@@ -4,12 +4,26 @@ import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import QUESTIONS from '@/data/questions'
 
-// 六個面向：安心 / 力行 / 洞察 / 圓融 / 喜悅 / 發心
-const DIMENSIONS = ['安心之光', '力行之光', '洞察之光', '圓融之光', '喜悅之光', '發心之光'] as const
+// 六個面向：安心 / 力行 / 覺察 / 圓融 / 喜悅 / 信念
+const DIMENSIONS = ['安心之光', '力行之光', '覺察之光', '圓融之光', '喜悅之光', '信念之光'] as const
+
+// 小工具：洗牌
+function shuffle<T>(arr: T[]): T[] {
+  return [...arr].sort(() => Math.random() - 0.5)
+}
 
 export default function QuizPage() {
   const router = useRouter()
-  const total = QUESTIONS.length
+
+  // ✅ 初始化題目時，就先把每一題的 options 打散一次
+  const [questions] = useState(() =>
+    QUESTIONS.map((q) => ({
+      ...q,
+      options: shuffle(q.options),
+    }))
+  )
+
+  const total = questions.length
 
   // 第幾題（0-based）
   const [idx, setIdx] = useState(0)
@@ -18,7 +32,7 @@ export default function QuizPage() {
     Array.from({ length: total }, () => -1)
   )
 
-  const current = QUESTIONS[idx]
+  const current = questions[idx]
   const percent = Math.round(((idx + 1) / total) * 100)
   const canNext = answers[idx] !== -1
 
@@ -35,18 +49,25 @@ export default function QuizPage() {
   }
 
   const finishAndGoResult = () => {
-    // 簡單計分：每題的 6 個選項分別加到 6 個面向
-    // 你之後要改配分，只要調整這裡的規則即可
-    const score = Array(6).fill(0) as number[]
-    answers.forEach((a) => {
-      if (a >= 0 && a < 6) score[a] += 1
+    // ✅ 計分改成「看選到的選項對應哪一盞光」
+    const score = Array(DIMENSIONS.length).fill(0) as number[]
+
+    answers.forEach((a, qIndex) => {
+      if (a >= 0) {
+        const opt = questions[qIndex].options[a]
+        const key = opt.key
+        const dimIndex = DIMENSIONS.indexOf(key as (typeof DIMENSIONS)[number])
+        if (dimIndex >= 0) {
+          score[dimIndex] += 1
+        }
+      }
     })
 
     // 找出最高分面向
     const bestIndex = score.indexOf(Math.max(...score))
     const bestKey = DIMENSIONS[bestIndex] ?? '安心之光'
 
-    // 存起來給 /result 用（也方便你之後換成 URL 參數或 API）
+    // 存起來給 /result 用
     if (typeof window !== 'undefined') {
       sessionStorage.setItem(
         'lod_result',
@@ -66,7 +87,7 @@ export default function QuizPage() {
     }
   }
 
-  // 這裡做個很簡單的進度條，避免依賴你自訂的 Progress 元件 props
+  // 簡單進度條
   const ProgressBar = useMemo(
     () => (
       <div className="w-full">
@@ -92,7 +113,9 @@ export default function QuizPage() {
         {ProgressBar}
 
         <section className="mt-8 rounded-2xl bg-white/80 p-5 shadow-md ring-1 ring-black/5 backdrop-blur">
-          <h2 className="mb-4 text-xl font-semibold text-slate-900">{current.title}</h2>
+          <h2 className="mb-4 text-xl font-semibold text-slate-900">
+            {current.title}
+          </h2>
 
           <div className="space-y-3">
             {current.options.map((opt, i) => {
@@ -109,7 +132,7 @@ export default function QuizPage() {
                       : 'ring-1 ring-black/5',
                   ].join(' ')}
                 >
-                  {opt}
+                  {opt.label}
                 </button>
               )
             })}

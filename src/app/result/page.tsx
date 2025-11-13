@@ -24,8 +24,8 @@ type Key = typeof LABELS[number]
 
 // ✨ 圖示 + 副標（粗體 note）
 const ICONS: Record<Key, { src: string; color: string; note: string }> = {
-  安心之光: { src: '/icons/peace.svg?v=2',  color: '#5bc0be', note: '<b>從焦慮與不安回到安定</b>' },
-  力行之光: { src: '/icons/action.svg?v=2', color: '#39A0FF',  note: '<b>從倦怠與遲疑回到行動</b>' },
+  安心之光: { src: '/icons/peace.svg?v=2',  color: '#39A0FF', note: '<b>從焦慮與不安回到安定</b>' },
+  力行之光: { src: '/icons/action.svg?v=2', color: '#5bc0be',  note: '<b>從倦怠與遲疑回到行動</b>' },
   覺察之光:{ src: '/icons/insight.svg?v=2', color: '#6f5bd3',  note: '<b>從混亂與迷惑回到清明</b>' },
   圓融之光: { src: '/icons/harmony.svg?v=2',color: '#f59e0b',  note: '<b>從執著與剛硬打開心扉</b>' },
   喜悅之光: { src: '/icons/joy.svg?v=2',    color: '#f6c453',  note: '<b>從外在回歸內在的價值</b>' },
@@ -171,21 +171,38 @@ export default function ResultPage() {
           </div>
 
           {/* 主結果卡 */}
-          <section className="mx-auto max-w-2xl rounded-2xl bg-white/80 p-6 shadow-md ring-1 ring-black/5 backdrop-blur text-center">
-            <div className="mb-4 flex justify-center">
-              <Image src={icon.src} alt={bestKey} width={120} height={120} />
-            </div>
-            <h2 className="mb-1 text-2xl font-bold" style={{ color: icon.color }}>
-              【{bestKey}】
-            </h2>
-            <p
-              className="text-slate-700 mb-4"
-              dangerouslySetInnerHTML={{ __html: icon.note }}
-            />
-            <div className="text-slate-700 leading-7 space-y-1">
-              {bodyLines.map((line, i) => (
-                <p key={i}>{line}</p>
-              ))}
+                    {/* 主結果卡 */}
+          <section className="mx-auto max-w-4xl rounded-2xl bg-white/80 p-8 shadow-md ring-1 ring-black/5 backdrop-blur">
+            {/* 讓整個「icon + 文字」組合在卡片裡置中 */}
+            <div className="flex justify-center">
+              {/* 左圖右文 */}
+              <div className="flex items-center gap-8">
+                {/* 左邊 icon */}
+                <div className="flex-shrink-0">
+                  <Image
+                    src={icon.src}
+                    alt={bestKey}
+                    width={200}   // 想再大可以改 220、240
+                    height={200}
+                  />
+                </div>
+
+                {/* 右邊文字：靠左排 */}
+                <div className="text-left">
+                  <h2 className="mb-2 text-3xl font-bold" style={{ color: icon.color }}>
+                    【{bestKey}】
+                  </h2>
+                  <p
+                    className="text-slate-700 mb-4 text-lg leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: icon.note }}
+                  />
+                  <div className="text-slate-700 text-lg leading-8 space-y-2">
+                    {bodyLines.map((line, i) => (
+                      <p key={i}>{line}</p>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
 

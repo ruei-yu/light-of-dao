@@ -107,7 +107,7 @@
 
 /* 六個顏色各自閃爍 */
 .glow--pink{
-  background: radial-gradient(36vw 42vh at 10% 10%, rgba(255, 109, 131, 0.9) 0%, rgba(255,182,193,0) 60%);
+  background: radial-gradient(36vw 42vh at 10% 10%, rgba(255, 123, 143, 0.9) 0%, rgba(255,182,193,0) 60%);
   animation-delay: 0.1s;
 }
 .glow--orange{
@@ -132,7 +132,7 @@
 }
 
 @media (max-width: 640px){
-  .hero-glow { animation-duration: 2.6s; filter: blur(18px) saturate(108%); }
+  .hero-glow { animation-duration: 1.6s; filter: blur(18px) saturate(108%); }
   .hero-glow-layer .glow{ filter: blur(12px) saturate(120%); }
 }
 

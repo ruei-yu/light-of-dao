@@ -6,12 +6,12 @@ type AuraProps = {
 
 // 六光對應顏色（主色 + 補色光暈）
 const colorMap: Record<string, { main: string; accent: string }> = {
-  安心之光: { main: '#9be2c5', accent: '#d8fff0' }, // 綠
-  力行之光: { main: '#9ecaff', accent: '#e4f1ff' }, // 藍
+  安心之光: { main: '#9ecaff', accent: '#e4f1ff' }, // 綠
+  力行之光: { main: '#9be2c5', accent: '#d8fff0' }, // 藍
   洞察之光: { main: '#bba4ff', accent: '#f0eaff' }, // 紫
   圓融之光: { main: '#fbbf77', accent: '#fff3e0' }, // 橘
   喜悅之光: { main: '#fef4c1', accent: '#fffbe0' }, // 黃
-  發心之光: { main: '#ffc0cb', accent: '#fff0f3' }, // 粉
+  信念之光: { main: '#ffc0cb', accent: '#fff0f3' }, // 粉
 }
 
 export default function BackgroundAura({ theme }: AuraProps) {
