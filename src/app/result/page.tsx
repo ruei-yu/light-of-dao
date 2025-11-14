@@ -89,22 +89,18 @@ type ResultPayload = {
   answers: number[]
 }
 
-// 共用複製函式（有備援 + 提示）
-async function copyToClipboard(text: string) {
+// 共用複製函式（簡單穩定版，永遠會跳 alert）
+function copyToClipboard(text: string) {
   try {
-    if (navigator.clipboard && window.isSecureContext) {
-      await navigator.clipboard.writeText(text)
-    } else {
-      const textarea = document.createElement('textarea')
-      textarea.value = text
-      textarea.style.position = 'fixed'
-      textarea.style.left = '-9999px'
-      document.body.appendChild(textarea)
-      textarea.focus()
-      textarea.select()
-      document.execCommand('copy')
-      document.body.removeChild(textarea)
-    }
+    const textarea = document.createElement('textarea')
+    textarea.value = text
+    textarea.style.position = 'fixed'
+    textarea.style.left = '-9999px'
+    document.body.appendChild(textarea)
+    textarea.focus()
+    textarea.select()
+    document.execCommand('copy')
+    document.body.removeChild(textarea)
     alert('已複製連結，可以貼給朋友囉！')
   } catch (err) {
     console.error(err)
@@ -237,11 +233,26 @@ export default function ResultPage() {
     [],
   )
 
+  // 分享測驗
   const handleCopyShareQuiz = () => {
     const url = `${BASE_URL}/`
-    copyToClipboard(url)
+
+    if (navigator.share) {
+      navigator
+        .share({
+          title: 'Light of Dao 心燈測驗',
+          text: '我做了一個「心之光」測驗，邀你一起點亮自己的心燈。',
+          url,
+        })
+        .catch(() => {
+          // 使用者取消就略過
+        })
+    } else {
+      copyToClipboard(url)
+    }
   }
 
+  // 分享結果
   const handleCopyShareResult = () => {
     if (!data) return
 
@@ -254,7 +265,20 @@ export default function ResultPage() {
 
     const encoded = btoa(JSON.stringify(payload))
     const url = `${BASE_URL}/result?r=${encodeURIComponent(encoded)}`
-    copyToClipboard(url)
+
+    if (navigator.share) {
+      navigator
+        .share({
+          title: '我的心之光測驗結果',
+          text: nameForShare
+            ? `這是 ${nameForShare} 的心之光測驗結果，一起來點燈吧。`
+            : '這是我的心之光測驗結果，一起來點燈吧。',
+          url,
+        })
+        .catch(() => {})
+    } else {
+      copyToClipboard(url)
+    }
   }
 
   return (
@@ -382,7 +406,7 @@ export default function ResultPage() {
                 return (
                   <div
                     key={k}
-                    className="rounded-2xl bg白/80 p-4 shadow-sm ring-1 ring-black/5 backdrop-blur"
+                    className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-black/5 backdrop-blur"
                   >
                     <div className="mb-3 flex items-center gap-3">
                       <Image src={it.src} alt={k} width={48} height={48} />
