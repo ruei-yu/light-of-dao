@@ -5,6 +5,8 @@ import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
+const BASE_URL = 'https://light-of-dao.vercel.app'
+
 // 背景光暈：只在 client render，避免 hydration error
 const BackgroundAura = dynamic(() => import('../components/BackgroundAura'), {
   ssr: false,
@@ -236,13 +238,14 @@ export default function ResultPage() {
   }
 
   const handleCopyShareQuiz = () => {
-    if (typeof window === 'undefined') return
-    const url = `${window.location.origin}/`
+  const handleCopyShareQuiz = () => {
+    const url = `${BASE_URL}/`
     copyToClipboard(url)
   }
 
   const handleCopyShareResult = () => {
-    if (typeof window === 'undefined' || !data) return
+    if (!data) return
+
     const nameForShare = nickname || sharedName || ''
     const payload: any = {
       score: data.score,
@@ -251,7 +254,7 @@ export default function ResultPage() {
     if (nameForShare) payload.name = nameForShare
 
     const encoded = btoa(JSON.stringify(payload))
-    const url = `${window.location.origin}/result?r=${encodeURIComponent(encoded)}`
+    const url = `${BASE_URL}/result?r=${encodeURIComponent(encoded)}`
     copyToClipboard(url)
   }
 
