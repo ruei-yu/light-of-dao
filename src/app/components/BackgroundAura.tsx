@@ -6,23 +6,28 @@ type AuraProps = {
 
 // 六光對應顏色（主色 + 補色光暈）
 const colorMap: Record<string, { main: string; accent: string }> = {
-  安心之光: { main: '#9ecaff', accent: '#e4f1ff' }, // 綠
-  力行之光: { main: '#9be2c5', accent: '#d8fff0' }, // 藍
-  洞察之光: { main: '#bba4ff', accent: '#f0eaff' }, // 紫
+  安心之光: { main: '#9ecaff', accent: '#e4f1ff' }, // 藍
+  力行之光: { main: '#9be2c5', accent: '#d8fff0' }, // 綠
+  覺察之光: { main: '#bba4ff', accent: '#f0eaff' }, // 紫
   圓融之光: { main: '#fbbf77', accent: '#fff3e0' }, // 橘
   喜悅之光: { main: '#fef4c1', accent: '#fffbe0' }, // 黃
   信念之光: { main: '#ffc0cb', accent: '#fff0f3' }, // 粉
 }
 
 export default function BackgroundAura({ theme }: AuraProps) {
-  const { main, accent } = colorMap[theme ?? ''] || { main: '#ffffff', accent: '#f9fafb' }
+  // 沒有或找不到 theme 時，用很淡的白色當底
+  const palette = (theme && colorMap[theme]) || {
+    main: '#f1f5f9',
+    accent: '#ffffff',
+  }
+
+  const { main, accent } = palette
 
   return (
     <div
-      aria-hidden
-      className="fixed inset-0 -z-10 transition-all duration-1000 ease-out"
+      aria-hidden="true"
+      className="fixed inset-0 -z-10 pointer-events-none transition-all duration-1000 ease-out"
       style={{
-        pointerEvents: 'none',
         backgroundImage: [
           // 柔和主色鋪滿整頁（基底）
           `linear-gradient(180deg, ${accent} 0%, ${main} 60%, ${accent} 100%)`,
@@ -36,7 +41,7 @@ export default function BackgroundAura({ theme }: AuraProps) {
         ].join(','),
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover',
-        filter: 'blur(60px) saturate(120%) brightness(1.05)',
+        filter: 'blur(60px) saturate(1.2) brightness(1.05)',
       }}
     />
   )
