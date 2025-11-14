@@ -89,6 +89,29 @@ type ResultPayload = {
   answers: number[]
 }
 
+// 共用複製函式（有備援 + 提示）
+async function copyToClipboard(text: string) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text)
+    } else {
+      const textarea = document.createElement('textarea')
+      textarea.value = text
+      textarea.style.position = 'fixed'
+      textarea.style.left = '-9999px'
+      document.body.appendChild(textarea)
+      textarea.focus()
+      textarea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textarea)
+    }
+    alert('已複製連結，可以貼給朋友囉！')
+  } catch (err) {
+    console.error(err)
+    alert('複製失敗，可以改用網址列手動複製。')
+  }
+}
+
 export default function ResultPage() {
   const [data, setData] = useState<ResultPayload | null>(null)
   const [nickname, setNickname] = useState('') // 自己輸入的暱稱
@@ -214,30 +237,6 @@ export default function ResultPage() {
     [],
   )
 
-  // 共用複製函式（有備援 + 提示）
-  async function copyToClipboard(text: string) {
-    try {
-      if (navigator.clipboard && (window as any).isSecureContext !== false) {
-        await navigator.clipboard.writeText(text)
-      } else {
-        const textarea = document.createElement('textarea')
-        textarea.value = text
-        textarea.style.position = 'fixed'
-        textarea.style.left = '-9999px'
-        document.body.appendChild(textarea)
-        textarea.focus()
-        textarea.select()
-        document.execCommand('copy')
-        document.body.removeChild(textarea)
-      }
-      alert('已複製連結，可以貼給朋友囉！')
-    } catch (err) {
-      console.error(err)
-      alert('複製失敗，可以改用網址列手動複製。')
-    }
-  }
-
-  const handleCopyShareQuiz = () => {
   const handleCopyShareQuiz = () => {
     const url = `${BASE_URL}/`
     copyToClipboard(url)
@@ -383,7 +382,7 @@ export default function ResultPage() {
                 return (
                   <div
                     key={k}
-                    className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-black/5 backdrop-blur"
+                    className="rounded-2xl bg白/80 p-4 shadow-sm ring-1 ring-black/5 backdrop-blur"
                   >
                     <div className="mb-3 flex items-center gap-3">
                       <Image src={it.src} alt={k} width={48} height={48} />
