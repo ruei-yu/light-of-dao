@@ -273,7 +273,7 @@ export default function ResultPage() {
             <input
               type="text"
               className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
-              placeholder="例如：小魚、Ruei-Yu..."
+              placeholder="例如：Ruei、Yu..."
               value={draftName}
               onChange={e => setDraftName(e.target.value)}
             />
