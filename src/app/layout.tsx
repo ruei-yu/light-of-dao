@@ -4,7 +4,7 @@ import './globals.css'
 
 export const metadata: Metadata = {
   title: 'Light of Dao',
-  description: '心燈測驗・找回內在的明',
+  description: '心燈測驗・找到你此刻最需要的「心光」',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
