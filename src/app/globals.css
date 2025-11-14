@@ -132,7 +132,7 @@
 }
 
 @media (max-width: 640px){
-  .hero-glow { animation-duration: 1.6s; filter: blur(18px) saturate(108%); }
+  .hero-glow { animation-duration: 0.8s; filter: blur(18px) saturate(108%); }
   .hero-glow-layer .glow{ filter: blur(12px) saturate(120%); }
 }
 

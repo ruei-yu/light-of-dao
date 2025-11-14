@@ -89,13 +89,19 @@ type ResultPayload = {
 
 export default function ResultPage() {
   const [data, setData] = useState<ResultPayload | null>(null)
+  const [nickname, setNickname] = useState('') // 自己輸入的暱稱
+  const [sharedName, setSharedName] = useState('') // 從分享連結來的暱稱
+  const [showNameModal, setShowNameModal] = useState(false)
+  const [draftName, setDraftName] = useState('')
+  const [fromShare, setFromShare] = useState(false)
 
   // 在 client 讀取：1) 分享連結中的結果 2) sessionStorage 中的結果
   useEffect(() => {
     try {
-      // 1) 先看網址上有沒有分享結果 (?r=...)
       const url = new URL(window.location.href)
       const shared = url.searchParams.get('r')
+
+      // 1) 先處理分享連結 (?r=...)
       if (shared) {
         const decoded = JSON.parse(atob(shared))
         if (Array.isArray(decoded?.score) && decoded.score.length === 6) {
@@ -115,11 +121,16 @@ export default function ResultPage() {
             answers: Array.isArray(decoded.answers) ? decoded.answers : [],
           }
           setData(payload)
+
+          if (typeof decoded.name === 'string' && decoded.name.trim()) {
+            setSharedName(decoded.name.trim())
+          }
+          setFromShare(true)
           return
         }
       }
 
-      // 2) 如果沒有分享結果，就看本機 sessionStorage
+      // 2) 沒有分享結果 → 用本機 sessionStorage
       const raw = window.sessionStorage.getItem('lod_result')
       if (!raw) return
       const parsed = JSON.parse(raw)
@@ -135,6 +146,16 @@ export default function ResultPage() {
           answers: Array.isArray(parsed.answers) ? parsed.answers : [],
         }
         setData(payload)
+
+        // 讀取暱稱（可選）
+        const storedName = window.sessionStorage.getItem('lod_name') || ''
+        const trimmed = storedName.trim()
+        if (trimmed) {
+          setNickname(trimmed)
+        } else {
+          // 沒有暱稱 → 顯示暱稱輸入視窗
+          setShowNameModal(true)
+        }
       }
     } catch (e) {
       console.error(e)
@@ -191,28 +212,95 @@ export default function ResultPage() {
     [],
   )
 
+  // 共用複製函式（有備援 + 提示）
+  async function copyToClipboard(text: string) {
+    try {
+      if (navigator.clipboard && (window as any).isSecureContext !== false) {
+        await navigator.clipboard.writeText(text)
+      } else {
+        const textarea = document.createElement('textarea')
+        textarea.value = text
+        textarea.style.position = 'fixed'
+        textarea.style.left = '-9999px'
+        document.body.appendChild(textarea)
+        textarea.focus()
+        textarea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textarea)
+      }
+      alert('已複製連結，可以貼給朋友囉！')
+    } catch (err) {
+      console.error(err)
+      alert('複製失敗，可以改用網址列手動複製。')
+    }
+  }
+
   const handleCopyShareQuiz = () => {
-    if (typeof window === 'undefined' || !navigator.clipboard) return
+    if (typeof window === 'undefined') return
     const url = `${window.location.origin}/`
-    navigator.clipboard.writeText(url)
+    copyToClipboard(url)
   }
 
   const handleCopyShareResult = () => {
-    if (typeof window === 'undefined' || !navigator.clipboard || !data) return
-    // 分享的 payload：別人只需要 score + bestKey 就能看到結果
-    const payload = {
+    if (typeof window === 'undefined' || !data) return
+    const nameForShare = nickname || sharedName || ''
+    const payload: any = {
       score: data.score,
       bestKey: data.bestKey,
     }
+    if (nameForShare) payload.name = nameForShare
+
     const encoded = btoa(JSON.stringify(payload))
     const url = `${window.location.origin}/result?r=${encodeURIComponent(encoded)}`
-    navigator.clipboard.writeText(url)
+    copyToClipboard(url)
   }
 
   return (
     <main className="relative min-h-screen px-6 py-10 sm:px-10 overflow-x-hidden">
       {/* 背景光暈（client-only） */}
       <BackgroundAura theme={data ? bestKey : undefined} />
+
+      {/* 暱稱輸入視窗：只在自己看結果且尚未留名字時跳出 */}
+      {showNameModal && !fromShare && (
+        <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/30">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-lg">
+            <h2 className="mb-2 text-lg font-semibold text-slate-900">
+              想用什麼名字點亮這盞心燈？
+            </h2>
+            <p className="mb-4 text-sm text-slate-600">
+              這是好友在你分享的結果頁看到的名字（可留空略過）。
+            </p>
+            <input
+              type="text"
+              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+              placeholder="例如：小魚、Ruei-Yu..."
+              value={draftName}
+              onChange={e => setDraftName(e.target.value)}
+            />
+            <div className="mt-4 flex justify-end gap-3">
+              <button
+                onClick={() => setShowNameModal(false)}
+                className="rounded-xl px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100"
+              >
+                先略過
+              </button>
+              <button
+                onClick={() => {
+                  const name = draftName.trim()
+                  if (name) {
+                    setNickname(name)
+                    window.sessionStorage.setItem('lod_name', name)
+                  }
+                  setShowNameModal(false)
+                }}
+                className="rounded-xl bg-slate-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-slate-800"
+              >
+                確認
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {!data ? (
         <div className="min-h-[60vh] flex flex-col items-center justify-center text-center">
@@ -227,6 +315,13 @@ export default function ResultPage() {
         </div>
       ) : (
         <div className="relative z-10 mx-auto max-w-4xl">
+          {/* 如果是從分享連結來，而且有名字，就顯示這一行 */}
+          {sharedName && (
+            <p className="mb-2 text-center text-slate-500">
+              這是 <span className="font-semibold">{sharedName}</span> 分享的測驗結果
+            </p>
+          )}
+
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-slate-900 mb-2">你的心之光</h1>
             <p className="text-slate-600">以下是你的測驗結果與六光導引</p>
