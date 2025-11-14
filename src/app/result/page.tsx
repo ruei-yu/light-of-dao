@@ -101,7 +101,8 @@ function copyToClipboard(text: string) {
     textarea.select()
     document.execCommand('copy')
     document.body.removeChild(textarea)
-    alert('已複製連結，可以貼給朋友囉！')
+
+    alert(`已複製連結，可以貼給朋友囉！\n\n${text}`)
   } catch (err) {
     console.error(err)
     alert('複製失敗，可以改用網址列手動複製。')
@@ -233,28 +234,18 @@ export default function ResultPage() {
     [],
   )
 
-  // 分享測驗
+  // 分享測驗：永遠複製 + alert
   const handleCopyShareQuiz = () => {
     const url = `${BASE_URL}/`
-
-    if (navigator.share) {
-      navigator
-        .share({
-          title: 'Light of Dao 心燈測驗',
-          text: '我做了一個「心之光」測驗，邀你一起點亮自己的心燈。',
-          url,
-        })
-        .catch(() => {
-          // 使用者取消就略過
-        })
-    } else {
-      copyToClipboard(url)
-    }
+    copyToClipboard(url)
   }
 
-  // 分享結果
+  // 分享結果：永遠複製 + alert
   const handleCopyShareResult = () => {
-    if (!data) return
+    if (!data) {
+      alert('目前沒有可以分享的結果，請先完成一次測驗喔。')
+      return
+    }
 
     const nameForShare = nickname || sharedName || ''
     const payload: any = {
@@ -265,20 +256,7 @@ export default function ResultPage() {
 
     const encoded = btoa(JSON.stringify(payload))
     const url = `${BASE_URL}/result?r=${encodeURIComponent(encoded)}`
-
-    if (navigator.share) {
-      navigator
-        .share({
-          title: '我的心之光測驗結果',
-          text: nameForShare
-            ? `這是 ${nameForShare} 的心之光測驗結果，一起來點燈吧。`
-            : '這是我的心之光測驗結果，一起來點燈吧。',
-          url,
-        })
-        .catch(() => {})
-    } else {
-      copyToClipboard(url)
-    }
+    copyToClipboard(url)
   }
 
   return (
